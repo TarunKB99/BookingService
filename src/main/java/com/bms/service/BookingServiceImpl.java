@@ -32,30 +32,34 @@ public class BookingServiceImpl implements BookingService {
 	@Autowired
 	private RestTemplate restTemplate;
 	
-	@Value("$(show.microservice.url")
+	@Value("${show.microservice.url}")
 	private String showEndpoint;
 	
 	@Override
 	public Booking createBooking(UUID userId, UUID showId, List<Seat> seats) {
 		UUID bookingId = UUID.randomUUID();
 		int totalPrice = 0;
-		Show show = restTemplate.getForObject(showEndpoint+"/getShowById/"+showId, Show.class);
+		Show show = restTemplate.getForObject(showEndpoint+"/getShowById/"+showId, Show.class);  
 		
 		//Checking if all the seats are available or not
 		for(Seat showSeat:show.getSeats()) {
 			for(Seat seat:seats) {
-				if(seat.getSeatID()==showSeat.getSeatID()) {
+				if(seat.getSeatID().compareTo(showSeat.getSeatID())==0) {
 					if(showSeat.isStatus()){
 						throw new SeatUnavailableException("The seat number : "+seat.getSeatNumber()+" is already booked");
 					}
 				}
-				totalPrice = totalPrice + seat.getPrice();
 			}
+		}
+		//Calculating total price of ticket
+		for(Seat seat:seats) {
+		totalPrice = totalPrice + seat.getPrice();
 		}
 		
 		//Calling updateSeat end point for changing the status of seat to booked
 		HttpEntity<List<Seat>> requestEntity = new HttpEntity<List<Seat>>(seats);
 		restTemplate.exchange(showEndpoint+"/updateSeatsByShow/"+showId+"/"+true, HttpMethod.PUT, requestEntity, Seat[].class);
+		
 	
 		Booking booking = new Booking();
 		booking.setBookingId(bookingId);
