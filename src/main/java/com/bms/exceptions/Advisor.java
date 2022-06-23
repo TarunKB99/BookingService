@@ -26,11 +26,12 @@ public class Advisor {
 		return new ResponseEntity<ErrorMessage>(error, HttpStatus.BAD_REQUEST);
 	}
 
-//	@ExceptionHandler(Exception.class)
-//	public ResponseEntity<ErrorMessage> handleException(Exception ex) {
-//		ErrorMessage errorMessage = new ErrorMessage(new Timestamp(System.currentTimeMillis()),
-//				HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal Server error", ex.getMessage());
-//		return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
-//	}
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorMessage> handleException(Exception ex) {
+		ErrorMessage errorMessage = new ErrorMessage(new Timestamp(System.currentTimeMillis()),
+				HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal Server error", ex.getMessage());
+		
+		return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }
